@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # QtCreator supports the following variables for Android, which are identical to qmake Android variables.
 # Check http://doc.qt.io/qt-5/deployment-android.html for more information.
-# They need to be set before the find_package(Qt5 ...) call.
+# They need to be set before the find_package(Qt6 ...) call.
 
 #if(ANDROID)
 #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
@@ -24,7 +24,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #    endif()
 #endif()
 
-find_package(Qt5 COMPONENTS Core Quick LinguistTools REQUIRED)
+find_package(Qt6 COMPONENTS Core Quick LinguistTools REQUIRED)
 
 # Pull in FC
 if (DEFINED FC_LIBRARY_PATH)
@@ -53,9 +53,7 @@ set(QAPPA_SOURCES
     Qappa/UXManager.cpp
     Qappa/UXManager.hpp)
 add_library(Qappa SHARED ${QAPPA_SOURCES})
-target_link_libraries(Qappa PUBLIC Qt5::Core Qt5::Quick)
-
-set(TS_FILES PollarisGui_en_US.ts)
+target_link_libraries(Qappa PUBLIC Qt6::Core Qt6::Quick)
 
 include_directories(cpp)
 set(POLLARIS_SOURCES
@@ -84,6 +82,8 @@ set(POLLARIS_SOURCES
     cpp/AbstractTableInterface.hpp
     cpp/TableSupport.hpp
     cpp/AbstractTable.hpp
+    cpp/TlsPskSession.cpp
+    cpp/TlsPskSession.hpp
     cpp/Tables.hpp
     cpp/Strings.cpp
     cpp/Strings.hpp
@@ -93,23 +93,19 @@ set(POLLARIS_SOURCES
 
 # Put KeyManager.cpp alone in a static library so it can link against fc but nothing else can
 add_library(KeyManager STATIC cpp/KeyManager.cpp cpp/KeyManager.hpp)
-target_link_libraries(KeyManager PRIVATE ${FC_LIBRARIES} Qt5::Core Qt5::Quick)
+target_link_libraries(KeyManager PRIVATE ${FC_LIBRARIES} Qt6::Core Qt6::Quick)
 
 if(ANDROID)
     add_library(PollarisGui SHARED
       ${POLLARIS_SOURCES}
-      ${TS_FILES}
     )
 else()
     add_executable(PollarisGui
       ${POLLARIS_SOURCES}
-      ${TS_FILES}
     )
 endif()
 
 target_compile_definitions(PollarisGui
   PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG> QT_MESSAGELOGCONTEXT)
 target_link_libraries(PollarisGui
-  PRIVATE Qappa KeyManager Qt5::Core Qt5::Quick)
-
-qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
+  PRIVATE Qappa KeyManager Qt6::Core Qt6::Quick)
